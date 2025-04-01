@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import Link from "next/link"
 import { signInWithEmailAndPassword } from "firebase/auth"
@@ -13,8 +12,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export default function SignIn() {
+  const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [phoneNumber, setPhoneNumber] = useState("")
@@ -31,9 +32,17 @@ export default function SignIn() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password)
-      // Redirect will happen automatically with Firebase Auth state change
+      router.push("/") // Redirect to dashboard after successful signin
     } catch (error: any) {
-      setError(error.message || "Failed to sign in")
+      let errorMessage = "Failed to sign in"
+      if (error.code === "auth/user-not-found") {
+        errorMessage = "No account found with this email"
+      } else if (error.code === "auth/wrong-password") {
+        errorMessage = "Incorrect password"
+      } else if (error.code === "auth/invalid-email") {
+        errorMessage = "Invalid email address"
+      }
+      setError(errorMessage)
       setLoading(false)
     }
   }
@@ -74,6 +83,7 @@ export default function SignIn() {
       if (verificationCode === "123456") {
         // Success - would redirect in a real app
         console.log("Verification successful")
+        router.push("/")
       } else {
         throw new Error("Invalid verification code")
       }

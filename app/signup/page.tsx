@@ -1,10 +1,9 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import Link from "next/link"
-import { createUserWithEmailAndPassword } from "firebase/auth"
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
 import { auth } from "@/lib/firebase"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,8 +13,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
+import { useRouter } from "next/navigation"
+import { doc, setDoc } from "firebase/firestore"
+import { db } from "@/lib/firebase"
+import { serverTimestamp } from "firebase/firestore"
 
 export default function SignUp() {
+  const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -44,10 +48,30 @@ export default function SignUp() {
     setLoading(true)
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password)
-      // Redirect will happen automatically with Firebase Auth state change
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+      await updateProfile(userCredential.user, {
+        displayName: name
+      })
+
+      // Create user document in Firestore
+      await setDoc(doc(db, "users", userCredential.user.uid), {
+        name,
+        email,
+        isAdmin: false,
+        createdAt: serverTimestamp(),
+      })
+
+      router.push("/")
     } catch (error: any) {
-      setError(error.message || "Failed to sign up")
+      let errorMessage = "Failed to sign up"
+      if (error.code === "auth/email-already-in-use") {
+        errorMessage = "Email is already registered"
+      } else if (error.code === "auth/weak-password") {
+        errorMessage = "Password should be at least 6 characters"
+      } else if (error.code === "auth/invalid-email") {
+        errorMessage = "Invalid email address"
+      }
+      setError(errorMessage)
       setLoading(false)
     }
   }
@@ -91,6 +115,7 @@ export default function SignUp() {
       if (verificationCode === "123456") {
         // Success - would redirect in a real app
         console.log("Verification successful")
+        router.push("/")
       } else {
         throw new Error("Invalid verification code")
       }
