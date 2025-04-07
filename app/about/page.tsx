@@ -2,8 +2,8 @@ import Image from "next/image"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "About Us - FinVest",
-  description: "Learn about FinVest, our mission, values, and team",
+  title: "About Us - 3M Finance",
+  description: "Learn about 3M Finance, our mission, values, and team",
 }
 
 export default function AboutPage() {
@@ -12,7 +12,7 @@ export default function AboutPage() {
       {/* Hero Section */}
       <section className="bg-black py-16">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold text-center mb-6 text-white">About FinVest</h1>
+          <h1 className="text-4xl font-bold text-center mb-6 text-white">About 3M Finance</h1>
           <p className="text-lg text-gray-200 text-center max-w-3xl mx-auto">
             Your trusted partner for equity and mutual fund investments. We're committed to helping you achieve your
             financial goals through smart, personalized investment solutions.
@@ -26,7 +26,7 @@ export default function AboutPage() {
           <div>
             <h2 className="text-3xl font-bold mb-6 text-black">Our Story</h2>
             <p className="text-gray-700 mb-4">
-              Founded in 2015, FinVest began with a simple mission: to make investing accessible, transparent, and
+              Founded in 2015, 3MFinance began with a simple mission: to make investing accessible, transparent, and
               rewarding for everyone. What started as a small team of financial experts has grown into a trusted
               investment platform serving thousands of clients across the country.
             </p>
